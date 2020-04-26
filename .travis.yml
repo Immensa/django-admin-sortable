@@ -1,0 +1,30 @@
+language: python
+
+python:
+    - "3.4"
+    - "3.5"
+    - "3.6"
+
+env:
+    - DJANGO_VERSION=3.0.0 SAMPLE_PROJECT=sample_project
+
+branches:
+    only:
+        - develop
+
+matrix:
+    exclude:
+        -
+            python: "3.4"
+            env: DJANGO_VERSION=3.0.0 SAMPLE_PROJECT=sample_project
+
+        -
+            python: "3.5"
+            env: DJANGO_VERSION=3.0.0 SAMPLE_PROJECT=sample_project
+
+install:
+    - pip install django==$DJANGO_VERSION
+
+script:
+    - cd $SAMPLE_PROJECT
+    - python manage.py test

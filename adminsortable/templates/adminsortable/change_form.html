@@ -1,23 +1,23 @@
 {% extends change_form_template_extends %}
 {% load i18n admin_modify %}
-{% load url from future %}
-{% load static from staticfiles %}
+{% load static %}
 
 {% block extrahead %}
     {{ block.super }}
     {% url 'admin:jsi18n' as jsi18nurl %}
 
     {% if has_sortable_tabular_inlines or has_sortable_stacked_inlines %}
-        <script type="text/javascript" src="{% static 'adminsortable/js/jquery-ui-django-admin.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'adminsortable/js/jquery.django-csrf.js' %}"></script>
+        <script src="{% static 'adminsortable/js/jquery-ui-django-admin.min.js' %}"></script>
+        <script src="{% static 'adminsortable/js/jquery.ui.touch-punch.min.js' %}"></script>
+        {% include 'adminsortable/csrf/jquery.django-csrf.html' with csrf_cookie_name=csrf_cookie_name %}
     {% endif %}
 
     {% if has_sortable_tabular_inlines %}
-        <script type="text/javascript" src="{% static 'adminsortable/js/admin.sortable.tabular.inlines.js' %}"></script>
+        {% include 'adminsortable/edit_inline/admin.sortable.tabular.inlines.html' with after_sorting_js_callback_name=after_sorting_js_callback_name %}
     {% endif %}
 
     {% if has_sortable_stacked_inlines %}
-        <script type="text/javascript" src="{% static 'adminsortable/js/admin.sortable.stacked.inlines.js' %}"></script>
+        {% include 'adminsortable/edit_inline/admin.sortable.stacked.inlines.html' with after_sorting_js_callback_name=after_sorting_js_callback_name %}
     {% endif %}
 {% endblock %}
 
@@ -25,6 +25,7 @@
     {{ block.super }}
     {% if has_sortable_tabular_inlines or has_sortable_stacked_inlines %}
         <link rel="stylesheet" type="text/css" href="{% static 'adminsortable/css/admin.sortable.inline.css' %}" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
     {% endif %}
 {% endblock %}
 

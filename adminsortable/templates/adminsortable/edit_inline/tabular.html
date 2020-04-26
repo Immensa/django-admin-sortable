@@ -1,5 +1,6 @@
-{% load i18n admin_static admin_modify %}{% load cycle from future %}
-<div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
+{% load i18n admin_urls static admin_modify django_template_additions %}{% load cycle from future %}
+{% get_django_version as django_version %}
+<div class="inline-group {% if django_version.major >= 1 and django_version.minor >= 9 %}flat-admin{% endif %}" id="{{ inline_admin_formset.formset.prefix }}-group">
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
 <fieldset class="module">
@@ -10,7 +11,7 @@
      {% for field in inline_admin_formset.fields %}
        {% if not field.widget.is_hidden %}
          <th{% if forloop.first %} colspan="2"{% endif %}{% if field.required %} class="required"{% endif %}>{{ field.label|capfirst }}
-         {% if field.help_text %}&nbsp;<img src="{% static "admin/img/icon-unknown.gif" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}" />{% endif %}
+         {% if field.help_text %}&nbsp;<img src="{% if django_version.major >= 1 and django_version.minor >= 9 %}{% static "admin/img/icon-unknown.svg" %}{% else %}{% static "admin/img/icon-unknown.gif" %}{% endif %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}" />{% endif %}
          </th>
        {% endif %}
      {% endfor %}
@@ -26,7 +27,13 @@
              id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}">
         <td class="original">
           {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
-          {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
+            {% with initial_forms_count=inline_admin_form.formset.management_form.INITIAL_FORMS.value %}
+            <i class="fa fa-{% if forloop.first %}sort-desc{% elif forloop.counter == initial_forms_count %}sort-asc{% else %}sort{% endif %}"></i>
+            {% endwith %}
+          {% if inline_admin_form.original %}
+              {{ inline_admin_form.original }}
+              {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="inlinechangelink">{% trans "Change" %}</a>{% endif %}
+          {% endif %}
           {% if inline_admin_form.show_url %}<a href="{% url 'admin:view_on_site' inline_admin_form.original_content_type_id inline_admin_form.original.pk %}">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
           {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
@@ -41,7 +48,7 @@
           {% endfor %}
           {% endspaceless %}
           {% if inline_admin_form.original %}
-          <input type="hidden" name="admin_sorting_url" value="{% url 'admin:admin_do_sorting' inline_admin_form.original.model_type_id %}" />
+          <input type="hidden" name="admin_sorting_url" value="{% url opts|admin_urlname:'do_sorting' inline_admin_form.original.model_type_id %}" />
           {% endif %}
         </td>
         {% for fieldset in inline_admin_form %}

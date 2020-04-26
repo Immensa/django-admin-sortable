@@ -19,8 +19,13 @@
 #sortable ul li
 {
 	overflow: auto;
+	margin-bottom: 8px;
 	margin-left: 0;
 	display: block;
+}
+
+#sortable ul li:last-child {
+	margin-bottom: 0;
 }
 
 #sortable .sortable
@@ -42,7 +47,16 @@
 	margin-bottom: 0;
 }
 
+.sortable-help-text {
+	color: #999;
+	font-size: 13px;
+}
+
 .sortable a:hover
 {
 	color: #003366;
+}
+
+.sortable .fa {
+	margin-right: 7px;
 }
